@@ -1,0 +1,20 @@
+High Level algorithm:
+
+Use A* algorithm, where the heuristic is the euclidean distance to the target position.
+
+
+Robot:
+Install the line sensor next to one of the wheels, such that it is aligned with the axis of the wheels. The idea is that we can use the color sensor to identify when the robot arrives at a cross roads, and to correct for any error build up when the robot turns from one pose to another.
+
+
+Navigation:
+Start at some known starting position and orientation.
+Use the range sensor to regulate the robot to a certain distance from the wall, when moving from box to box. Note, we need to be careful, if the robot moves along a wall and then the wall ends. We should have a PID controller for the wall distance regulation, but if the distance from the wall changes suddenly, we just continue in a straight line.
+We know that we’ve gotten to the next position when the line detector triggers.
+Rotate 90 degrees 4 times, and update map with walls. 
+Factor this into A* algorithm, and compute next step.
+
+
+Questions and Concerns: 
+
+What do we do when invalid measurement is taken? ignore, measure again or mark direction? (now it is implemented as ignore)
