@@ -155,6 +155,7 @@ public class ROB301_Project_2018_Student {
 		walldist = getwalldist();
 		switch(curHead){
 			// Question: What do we do when invadid measurement? ignore, measure again or mark direction?
+			// I changed the following part a little to avoid assignment issues:
 			case 'L':	//The robot is facing negative x
 				// Check if measurements are feasable (must be in boundaries)
 				if (ypos-walldist[0]>=1 && walldist[0] != 0){
