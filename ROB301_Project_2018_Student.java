@@ -218,9 +218,9 @@ public class ROB301_Project_2018_Student {
 			sonic.fetchSample(sonicsample,0);
 			float distance_cm = sonicsample[0]*100;
 	
-			// sonic constants
-			float frontwalldist = 10 + 30*(nextwall-1); // true distance when color sensor is exactly on cross junction
-			float eps = 2; // threshold to stop PID before colorsensor reaches crossjunction
+            // sonic constants
+            // distance Sensor should measure to front wall when moved by one block
+			float frontwalldist = 10 + 30*(nextwall-1); 
 	
 			// Motor setup
 			int basespeed = 80;
@@ -244,36 +244,27 @@ public class ROB301_Project_2018_Student {
 			// if condition not fullfilled from beginning, then maybe front wall measurement again?
 			while (distance_cm > frontwalldist && distance_cm > 5){
 				
-				if(distance_cm > frontwalldist+eps){
-					color.getRedMode().fetchSample(line_measurement, 0); // 0 is on line, 0.6 is outside
-					err = line_measurement[0] - eq_point; // err < 0 -> too far on line, err > 0 --> too far outside line 
-					err_dot = err - err_prev;
-					u = kp * err + kd * err_dot;
-					System.out.println("colorsensor" + line_measurement[0]);
-					System.out.println("measured" + distance_cm);
+                color.getRedMode().fetchSample(line_measurement, 0); // 0 is on line, 0.6 is outside
+                err = line_measurement[0] - eq_point; // err < 0 -> too far on line, err > 0 --> too far outside line 
+                err_dot = err - err_prev;
+                u = kp * err + kd * err_dot;
+                System.out.println("colorsensor" + line_measurement[0]);
+                System.out.println("measured" + distance_cm);
 
-		
-					// Sensor is on the left side of the Line
-					Motor.B.setSpeed(basespeed+(int)u);
-					Motor.D.setSpeed(basespeed-(int)u);
-					Motor.B.forward();
-					Motor.D.forward();
-	
-					err_prev = err;
-	
-					// only measure distance if we are near the line and not too twisted to avoid bad measurements
-					if (err < 0.1 && err_dot < 0.1){
-						sonic.fetchSample(sonicsample,0);
-						distance_cm = sonicsample[0]*100;
-					}
-				} else{
-					Motor.B.setSpeed(basespeed);
-					Motor.D.setSpeed(basespeed);
-					Motor.B.forward();
-					Motor.D.forward();
-					sonic.fetchSample(sonicsample,0);
-					distance_cm = sonicsample[0]*100;
-				}
+                // Sensor is on the left side of the Line
+                Motor.B.setSpeed(basespeed+(int)u);
+                Motor.D.setSpeed(basespeed-(int)u);
+                Motor.B.forward();
+                Motor.D.forward();
+
+                err_prev = err;
+
+                // only measure distance if we are near the line and not too twisted to avoid bad measurements
+                if (err < 0.1 && err_dot < 0.1){
+                    sonic.fetchSample(sonicsample,0);
+                    distance_cm = sonicsample[0]*100;
+                }
+
 			}
 			Motor.B.stop();
 			Motor.D.stop();
@@ -427,7 +418,7 @@ public class ROB301_Project_2018_Student {
 		nextwall -= 1; // easier for calculation in other function
 		return nextwall;
 	}
-	/*public static Graph getGraph(char[][] map, int sizeX, int sizeY, Map<Character, int[]> char_to_position){ 
+	public static Graph getGraph(char[][] map, int sizeX, int sizeY, Map<Character, int[]> char_to_position){ 
 		// Iterate through each robot position of the map
 		char[] neighbours;
 		Graph g = new Graph();
@@ -448,7 +439,7 @@ public class ROB301_Project_2018_Student {
 			}
 		}
 		return g;
-	}*/
+	}
 	
 	// gets 4 neighbours from in this order: U,R,D,L
 	public static char[] getNeighbours(char position, char[][] map, Map<Character, int[]> char_to_position){ 
@@ -460,12 +451,25 @@ public class ROB301_Project_2018_Student {
 		 * Function: Return neighbors to queried node 
 		***/
 		int[] cur_coord = char_to_position.get(position);
-		char[] neighbours = new char[4]; // UPDATE THIS
-		neighbours[0] = map[cur_coord[0]][cur_coord[1]-2];
-		neighbours[1] = map[cur_coord[0]+2][cur_coord[1]];
-		neighbours[2] = map[cur_coord[0]][cur_coord[1]+2];
-		neighbours[3] = map[cur_coord[0]-2][cur_coord[1]];
-
+        char[] neighbours = new char[4]; // UPDATE THIS
+        
+            if (cur_coord[1]-2 >= 0){
+                neighbours[0] = map[cur_coord[0]][cur_coord[1]-2];
+                continue;
+            } 
+            if (cur_coord[0]+2 < 11){
+                neighbours[1] = map[cur_coord[0]+2][cur_coord[1]];
+                continue;
+            }
+            if (cur_coord[1]+2 < 11){
+                neighbours[2] = map[cur_coord[0]][cur_coord[1]+2];
+                continue;
+            } 
+            if (cur_coord[0]-2 >= 0){
+                neighbours[3] = map[cur_coord[0]-2][cur_coord[1]];
+                continue;
+            }
+            
 		return neighbours;
 	}
 	
