@@ -243,6 +243,8 @@ public class ROB301_Project_2018_Student {
 					distance_cm = sonicsample[0]*100;
 				}
 			}
+			Motor.B.stop();
+			Motor.C.stop();
 			sonic.close();
 			color.close();
 		}
