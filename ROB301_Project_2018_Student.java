@@ -37,13 +37,23 @@ public class ROB301_Project_2018_Student {
 		
 		
 		my_map[1][6] = '1'; // Add a wall to the map (for demo)
-		updateMap(char curPos, char curHead, int isWall);
+		updateMap(curPos,curHead);
 		g = getGraph(my_map, sizeMapX, sizeMapY, char_to_position); // Create graph out of initialized map
 		optPath = g.getShortestPath(curPos, goalPos); // Get optimal path from current position to goal
 		System.out.println("Optimal Path: " + optPath);
 		printMap(my_map); // Print map to see structure of map (can choose to print for debugging purposes)
 		
-		// Insert your code here...
+		while (curPos != goalPos && curHead != goalHead){
+			updateMap(curPos, curHead);
+			optPath = g.getShortestPath(curPos, goalPos); // Get optimal path from current position to goal
+
+			// needs the next Heading as input
+			curHead = rotateRobot(curHead, nextHead);
+			int nextwall = getnextwall(curPos, curHead);
+			move(nextwall);
+			curPos = moveRobot(my_map, curPos, curHead);
+		}
+
 	}
 	
 	public static void initializeMap(){ 
@@ -102,108 +112,210 @@ public class ROB301_Project_2018_Student {
 			}
 		}
 	}
-	
-	public static void updateMap(char curPos, char curHead, int isWall){ 
+
+	public static void updateMap(char curPos, char curHead){ 
 		/***
 		 * Inputs: current Position, current Heading, an integer isWall which is 1 if sensor detects a wall, 0 otherwise
 		 * Outputs: None
 		 * Function: Use current position and heading to correctly add a wall to the map my_map 
 		***/
 		
-		
-		int xpos = 0;
-		int ypos = 0;
-		
-		switch(curPos){
-			case'A': case'B': case'C': case'D': case'E':
-				ypos = 1;
-				break;
-			case'F': case'G': case'H': case'I': case'J':
-				ypos = 3;
-				break;
-			case'K': case'L': case'M': case'N': case'O':
-				ypos = 5;
-				break;
-			case'P': case'Q': case'R': case'S': case'T':
-				ypos = 7;
-				break;
-			case'U': case'V': case'W': case'X': case'Y':
-				ypos = 10;
-				break;
-				}
-		
-		switch(curPos){
-			case'A': case'F': case'K': case'P': case'U':
-				xpos = 1;
-				break;
-			case'B': case'G': case'L': case'Q': case'V':
-				xpos = 3;
-				break;
-			case'C': case'H': case'M': case'R': case'W':
-				xpos = 5;
-				break;
-			case'D': case'I': case'N': case'S': case'X':
-				xpos = 7;
-				break;
-			case'E': case'J': case'O': case'T': case'Y':
-				xpos = 10;
-				break;
-				}
+		int[] cur_coord = char_to_position.get(curPos);
+
+		int xpos = cur_coord[0];
+		int ypos = cur_coord[1];
 				
 		int[] walldist = new int[3];
 		// walldist[0] is right, [1] is front, [2] is left
 		walldist = getwalldist();
 		switch(curHead){
 			// Question: What do we do when invadid measurement? ignore, measure again or mark direction?
-			// I changed the following part a little to avoid assignment issues:
 			case 'L':	//The robot is facing negative x
-				// Check if measurements are feasable (must be in boundaries)
+				// Check if measurements are feasable (must be in boundaries of map)
 				if (ypos-walldist[0]>=1 && walldist[0] != 0){
-					my_map[xpos][ypos-walldist[1]] = (char)isWall;
+					my_map[xpos][ypos-walldist[1]] = (char)1;
 				} 
 				if (xpos-walldist[1]>=1 && walldist[1] != 0){
-					my_map[xpos-walldist[2]][ypos] = (char)isWall;
+					my_map[xpos-walldist[2]][ypos] = (char)1;
 				}
 				if(ypos+walldist[2] <= 9 && walldist[2] != 0){
-					my_map[xpos][ypos+walldist[3]] = (char)isWall;
+					my_map[xpos][ypos+walldist[3]] = (char)1;
 				}
 				break;
 			case 'R':
 				if (ypos+walldist[0]<=9 && walldist[0] != 0){
-					my_map[xpos][ypos+walldist[1]] = (char)isWall;
+					my_map[xpos][ypos+walldist[1]] = (char)1;
 				} 
 				if (xpos+walldist[1]<=9 && walldist[1] != 0){
-					my_map[xpos+walldist[2]][ypos] = (char)isWall;
+					my_map[xpos+walldist[2]][ypos] = (char)1;
 				}
 				if(ypos-walldist[2] >= 1 && walldist[2] != 0){
-					my_map[xpos][ypos-walldist[3]] = (char)isWall;
+					my_map[xpos][ypos-walldist[3]] = (char)1;
 				}
 				break;
 			case 'U':
 					if (xpos+walldist[0]<=9 && walldist[0] != 0){
-						my_map[xpos+walldist[1]][ypos] = (char)isWall;
+						my_map[xpos+walldist[1]][ypos] = (char)1;
 					} 
 					if (ypos-walldist[1]>=1 && walldist[1] != 0){
-						my_map[xpos][ypos-walldist[1]] = (char)isWall;
+						my_map[xpos][ypos-walldist[1]] = (char)1;
 					}
 					if(xpos-walldist[2] >= 1 && walldist[2] != 0){
-						my_map[xpos-walldist[2]][ypos] = (char)isWall;
+						my_map[xpos-walldist[2]][ypos] = (char)1;
 					}
 				break;
 			case 'D':
 					if (xpos-walldist[0]>=1 && walldist[0] != 0){
-						my_map[xpos-walldist[1]][ypos] = (char)isWall;
+						my_map[xpos-walldist[1]][ypos] = (char)1;
 					} 
 					if (ypos+walldist[1]<=9 && walldist[1] != 0){
-						my_map[xpos][ypos+walldist[1]] = (char)isWall;
+						my_map[xpos][ypos+walldist[1]] = (char)1;
 					}
 					if(xpos+walldist[2] <= 9 && walldist[2] != 0){
-						my_map[xpos+walldist[2]][ypos] = (char)isWall;
+						my_map[xpos+walldist[2]][ypos] = (char)1;
 					}
 				break;
 				}		
 	}
 	
+		// moves robot one step to the front
+		public static void move(int nextwall){ 
+
+			// Color Setup
+			EV3ColorSensor color = new EV3ColorSensor(SensorPort.S3); 
+			int sampleSize_color = color.sampleSize();
+			float[] line_measurement = new float[sampleSize_color]; 
+			color.getColorIDMode().fetchSample(line_measurement, 0); 
+			//LCD.clear();
+			//System.out.println(line_measurement[0]);
+	
+			// Sonic Setup
+			EV3UltrasonicSensor sonic = new EV3UltrasonicSensor(SensorPort.S4);
+			int sampleSize_sonic = sonic.sampleSize();
+			float[] sonicsample = new float[sampleSize_sonic];
+			sonic.fetchSample(sonicsample,0);
+			float distance_cm = sonicsample[0]*100;
+	
+			// sonic constants
+			float frontwalldist = 20 + 30*nextwall; // true distance when color sensor is exactly on cross junction
+			float eps = 2; // threshold to stop PID before colorsensor reaches crossjunction
+	
+			// Motor setup
+			int basespeed = 60;
+			Motor.B.setSpeed(basespeed); // B is left motor
+			Motor.C.setSpeed(basespeed); // C is right motor
+			//float A_init = Motor.B.getTachoCount();
+			//float B_init = Motor.C.getTachoCount();
+	
+			// PID Constants
+			float eq_point = 0.25;
+			float err;
+			float err_prev = 0;
+			float err_dot;
+			float u;
+			int kp = 100;
+			int kd = 50;
+	
+			// if condition not fullfilled from beginning, then maybe front wall measurement again?
+			while (distance_cm > frontwalldist){
+				
+				if(distance_cm > frontwalldist+eps){
+					color.getColorIDMode().fetchSample(line_measurement, 0); // 0 is on line, 0.6 is outside
+					err = line_measurement[0] - eq_point; // err < 0 -> too far on line, err > 0 --> too far outside line 
+					err_dot = err - err_prev;
+					u = kp * err + kd * err_dot;
+		
+					// Sensor is on the right side of the Line
+					Motor.B.forward(basespeed-(int)u);
+					Motor.C.forward(basespeed+(int)u);
+	
+					err_prev = err;
+	
+					// only measure distance if we are near the line and not too twisted to avoid bad measurements
+					if (err < 0.1 && err_dot < 0.1){
+						sonic.fetchSample(sonicsample,0);
+						distance_cm = sonicsample[0]*100;
+					}
+				} else{
+					Motor.B.forward(basespeed);
+					Motor.C.forward(basespeed);
+					sonic.fetchSample(sonicsample,0);
+					distance_cm = sonicsample[0]*100;
+				}
+			}
+			sonic.close();
+			color.close();
+		}
+
+	// Updates Position after move() command -> Moves current position one in direction of current heading
+	public static char moveRobot(char[][] map, char curPos, char curHead){
+		
+		int[] cur_coord = char_to_position.get(curPos);
+		int xpos = cur_coord[0];
+		int ypos = cur_coord[1];
+		char next_curPos;
+				
+		switch(curHead){
+			case 'L':	//The robot is facing negative x
+				next_curPos = map[xpos-2][ypos];
+				break;
+			case 'R':
+				next_curPos = map[xpos+2][ypos];
+				break;
+			case 'U':
+				next_curPos = map[xpos][ypos-2];
+				break;
+			case 'D':
+				next_curPos = map[xpos][ypos+2];
+				break;
+				}	
+				
+		return next_curPos;
+	}
+
+	public static char rotateRobot(char curHead, char nextHead){
+
+		// Motor setup
+		int basespeed = 60;
+		Motor.B.setSpeed(basespeed); // B is left motor
+		Motor.C.setSpeed(basespeed); // C is right motor
+		float fullrot_aroundwheel = 4.2727 * 360;
+		float quarterrot = fullrot_aroundwheel*0.25;
+		float fullrot_onspot = 2.13636 * 360;
+		float halfrot_onspot = fullrot_onspot*0.5;
+
+		int curhead2ind;
+		int nexthead2ind;
+
+		switch(curHead){
+			case "U": curhead2ind = 0; break;
+			case "R": curhead2ind = 1; break;
+			case "D": curhead2ind = 2; break;
+			case "L": curhead2ind = 3; break;
+		}
+		switch(nextHead){
+			case "U": nexthead2ind = 0; break;
+			case "R": nexthead2ind = 1; break;
+			case "D": nexthead2ind = 2; break;
+			case "L": nexthead2ind = 3; break;
+		}
+		int diff = nexthead2ind-curhead2ind;
+
+		if (diff == 1 || diff == -3){
+			// turn Robot 90deg clockwise, not moving right wheel
+			Motor.B.rotate((int)quarterrot);
+		} else if(diff == 2 || diff == -2){
+			// turn Robot 180deg clockwise on spot			
+			Motor.B.rotate((int)halfrot_onspot);
+			Motor.C.rotate(-(int)halfrot_onspot);
+		} else if(diff == 3 || diff == -1){
+			// turn Robot 90deg counter-clockwise, not moving left wheel
+			Motor.C.rotate((int)quarterrot);
+		}
+
+		return nextHead;
+	}
+
 	public static int[] getwalldist(){
 		//EV3TouchSensor touch = new EV3TouchSensor(SensorPort.S1);
 		//while
@@ -212,14 +324,12 @@ public class ROB301_Project_2018_Student {
 		int sampleSize = sonic.sampleSize();
 		float[] sonicsample = new float[sampleSize];
 		
-		Motor.A.setSpeed(60);
+		Motor.A.setSpeed(40);
 		int box = 30;
 		int sidedist = 15+5;
 		
 		for(int i=0; i<3; i+=1){
 			sonic.fetchSample(sonicsample,0);
-			
-			
 			sonicsample[0] = sonicsample[0]*100;
 			
 			// because of backward displacement of sensor offset second (forward) measurement:
@@ -239,45 +349,47 @@ public class ROB301_Project_2018_Student {
 			} else {
 				walldist[i] = 0;	// invalid measurement
 			}
-			Motor.A.rotate(-92);
-		}
-		Motor.A.rotate(-195);
-		sonic.close();
-		return walldist;
-	}
 
-	// moves robot one step to the front
-	public static void move(){ 
-
-		// get Linedetector measurement
-		EV3ColorSensor color = new EV3ColorSensor(SensorPort.S3); LCD.clear();
-		int sampleSize_color = color.sampleSize();
-		float[] line_measurement = new float[sampleSize_color]; 
-		color.getColorIDMode().fetchSample(line_measurement, 0); 
-		//LCD.clear();
-		System.out.println(line_measurement[0]);
-
-		EV3UltrasonicSensor sonic = new EV3UltrasonicSensor(SensorPort.S4);
-		int sampleSize_sonic = sonic.sampleSize();
-		float[] sonicsample = new float[sampleSize_sonic];
-		sonic.fetchSample(sonicsample,0);
-		float distance_cm = sonicsample[0]*100;
-
-		float A_init = Motor.A.getTachoCount();
-		float B_init = Motor.B.getTachoCount();
-		float frontwalldist = 20;
-		float eps = 2;
-		float intervall_dist = 30;
-		while (distance_cm > frontwalldist+eps || ){
-			sonic.fetchSample(sonicsample,0);
-			distance_cm = sonicsample[0]*100;
+			// measures first forward, then right, then left
+			if (i==0){
+				Motor.A.rotate(92);
+			} else if (i==1){
+				Motor.A.rotate(-195);
+			} else {
+				Motor.A.rotate(92);
+			}
 		}
 
+		// reorder walldist array
+		int placeholder = walldist[0];
+		walldist[0] = walldist[1];
+		walldist[1] = walldist[0];
 		sonic.close();
-		color.close();
-
+		return walldist; // 0: right measurement, 1: front, 2: Left
 	}
 
+	// calculates where next wall is (0: wall is just in front, 1: 1 square between robot and wall, 2:...)
+	public static void getnextwall(char curPos, char curHead){
+		int nextwall = 0;
+		int i = 1;
+		while (nextwall == 0){
+			if (curHead == 'L' && my_map[xpos-(i*2-1)][ypos] != '0'){
+				nextwall = i;
+			} else if (curHead == 'R' && my_map[xpos+(i*2-1)][ypos] != '0'){
+				nextwall = i;
+			} else if (curHead == 'U' && my_map[xpos][ypos-(i*2-1)] != '0'){
+				nextwall = i;
+			} else if (curHead == 'D' && my_map[xpos][ypos+(i*2-1)] != '0'){
+				nextwall = i;
+			}
+			if (i > 9){
+				System.out.print("No next wall detected");
+				break;
+			}
+			i = i+1;
+		}
+		nextwall -= 1; // easier for calculation in other function
+	}
 	public static Graph getGraph(char[][] map, int sizeX, int sizeY, Map<Character, int[]> char_to_position){ 
 		// Iterate through each robot position of the map
 		char[] neighbours;
@@ -301,6 +413,7 @@ public class ROB301_Project_2018_Student {
 		return g;
 	}
 	
+	// gets 4 neighbours from in this order: U,R,D,L
 	public static char[] getNeighbours(char position, char[][] map, Map<Character, int[]> char_to_position){ 
 		/***
 		 * Inputs: position (char identifier of position in map we want to get the neighbours of)
@@ -309,9 +422,13 @@ public class ROB301_Project_2018_Student {
 		 * Outputs: character array size between 1 and 4 of the neighbours (e.g. if we query H, return char will be 'C','I','M','G')
 		 * Function: Return neighbors to queried node 
 		***/
-		
-		// Insert your code here...
+		int[] cur_coord = char_to_position.get(position);
 		char[] neighbours = new char[4]; // UPDATE THIS
+		neighbours[0] = map[cur_coord[0]][cur_coord[1]-2];
+		neighbours[1] = map[cur_coord[0]+2][cur_coord[1]];
+		neighbours[2] = map[cur_coord[0]][cur_coord[1]+2];
+		neighbours[3] = map[cur_coord[0]-2][cur_coord[1]];
+
 		return neighbours;
 	}
 	
