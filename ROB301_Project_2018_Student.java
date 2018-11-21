@@ -28,53 +28,137 @@ public class ROB301_Project_2018_Student {
 		char goalPos = 'Y'; // Final position the robot needs to reach
 		char goalHead = 'U'; // Final orientation the robot needs to reach (either 'U', 'D', 'L', 'R')
 		
-		//List<Character> optPath; // Optimal path
+		List<Character> optPath; // Optimal path
 		
 		initializeMap(); // Initialize map with no walls
-		//Graph g = getGraph(my_map, sizeMapX, sizeMapY, char_to_position); // Create graph out of initialized map
-		//optPath = g.getShortestPath(curPos, goalPos); // Get optimal path from current position to goal
-		//System.out.println("Optimal Path: " + optPath);
 		printMap(my_map); // Print map to see structure of map (can choose to print for debugging purposes)
 		
 		
-		 //my_map[1][6] = '1'; // Add a wall to the map (for demo)
+		//my_map[1][6] = '1'; // Add a wall to the map (for demo)
 		//updateMap(curPos,curHead);
 		//g = getGraph(my_map, sizeMapX, sizeMapY, char_to_position); // Create graph out of initialized map
 		//optPath = g.getShortestPath(curPos, goalPos); // Get optimal path from current position to goal
 		//System.out.println("Optimal Path: " + optPath);
-		printMap(my_map); // Print map to see structure of map (can choose to print for debugging purposes)
+		//printMap(my_map); // Print map to see structure of map (can choose to print for debugging purposes)
 		
-		int i = 3;
 		//while (curPos != goalPos && curHead != goalHead){
-			if (Button.ENTER.isDown()){
-				return;
-			}
-			updateMap(curPos, curHead);
-			//printMap(my_map);
-			//optPath = g.getShortestPath(curPos, goalPos); // Get optimal path from current position to goal
 
-			// needs the next Heading as input
-			//char nextHead = 'R';
-			//curHead = rotateRobot(curHead, nextHead);
-			//int nextwall = getnextwall(curPos, curHead);
-			int nextwall = 1;
-			move(nextwall);
-			updateMap(curPos, curHead);
+        // **************************************************** //
 
-			char nextHead = 'D';
-			curHead = rotateRobot(curHead, nextHead);
+        // For all test cases make curPos = A and curHead = D
+        int nextwall = 3;
 
-			nextwall = 1;
-			move(nextwall);
-			updateMap(curPos, curHead);
-			//curPos = moveRobot(my_map, curPos, curHead);
-			
-			System.out.println("heade" + curHead);
-			nextHead = 'U';
-			curHead = rotateRobot(curHead, nextHead);
-			updateMap(curPos, curHead);
+        //*
 
-			
+        // Three test cases to test simultaniously:
+        while(!Button.ENTER.isDown()){
+            if(Button.LEFT.isDown()){
+                int[] cur_coord = char_to_position.get(curPos);
+                System.out.println("x position:" + cur_coord[0]);
+                System.out.println("y position:" + cur_coord[1]);
+            }
+            if(Button.RIGHT.isDown()){
+                char_to_position.get(curPos);
+                Graph g = getGraph(my_map, sizeMapX, sizeMapY, char_to_position); // Create graph out of initialized map
+                optPath = g.getShortestPath(curPos, goalPos); // Get optimal path from current position to goal
+                System.out.println("Optimal Path: " + optPath);
+            }
+            if(Button.ESCAPE.isDown()){
+                walldist = getwalldist();
+                System.out.println("walldistance to right wall" + walldist[0]);
+                System.out.println("walldistance to front wall" + walldist[1]);
+                System.out.println("walldistance to left wall" + walldist[2]);
+            }
+        }
+
+        /*
+        // 1. Test char_to_position function
+        int[] cur_coord = char_to_position.get(curPos);
+        System.out.println("x position:" + cur_coord[0]);
+        System.out.println("y position:" + cur_coord[1]);
+
+        // 2. Test Graph function
+        char_to_position.get(curPos);
+        Graph g = getGraph(my_map, sizeMapX, sizeMapY, char_to_position); // Create graph out of initialized map
+        optPath = g.getShortestPath(curPos, goalPos); // Get optimal path from current position to goal
+        System.out.println("Optimal Path: " + optPath);
+    
+        // 3. Test getwalldist precision
+        while(!Button.ENTER.isDown()){
+            walldist = getwalldist();
+            System.out.println("walldistance to right wall" + walldist[0]);
+            System.out.println("walldistance to front wall" + walldist[1]);
+            System.out.println("walldistance to left wall" + walldist[2]);
+        }
+        // 4. Test updateMap functionality by updating and printing new map of given points
+        updateMap(curPos, curHead);
+        printMap(my_map);
+        curPos = "R";
+        curHead = "U";
+        System.out.println("curPos" + curPos);
+        System.out.println("curHead" + curHead);
+        updateMap(curPos, curHead);
+        printMap(my_map);
+        updateMap(curPos, curHead);
+
+        // 5. Test getnextwall by updating map and getting nextwall
+        updateMap(curPos, curHead);
+        printMap(my_map);
+        System.out.println("curPos" + curPos);
+        System.out.println("curHead" + curHead);
+        nextwall = 3;
+        nextwall = getnextwall(curPos, curHead);
+        System.out.println("nextwall" + nextwall);
+        updateMap(curPos, curHead);
+        printMap(my_map);
+
+        // 6. Test 180 Deg Turn or any other turn
+        updateMap(curPos, curHead);
+        printMap(my_map);
+        System.out.println("curPos" + curPos);
+        System.out.println("curHead" + curHead);
+        nextHead = 'U';
+        curHead = rotateRobot(curHead, nextHead);
+        System.out.println("curPos" + curPos);
+        System.out.println("curHead" + curHead);
+
+        // 7. Test forward through nextwall recognition
+        updateMap(curPos, curHead);
+        printMap(my_map);
+        nextwall = 3;
+        while(nextwall != 0 && !Button.ENTER.isDown()){
+            nextwall = getnextwall(curPos, curHead);
+            System.out.println("nextwall" + nextwall);
+            System.out.println("curPos" + curPos);
+            System.out.println("curHead" + curHead);
+            move(nextwall);
+            curPos = moveRobot(my_map, curPos, curHead);
+            updateMap(curPos, curHead);
+            printMap(my_map);
+        }
+
+        // 8. Test forward movement until wall infront then rotate 180 deg
+        // make curPos = A and curHead = D
+        updateMap(curPos, curHead);
+        printMap(my_map);
+        nextwall = 3;
+        while(nextwall != 0 && !Button.ENTER.isDown()){
+            nextwall = getnextwall(curPos, curHead);
+            System.out.println("nextwall" + nextwall);
+            System.out.println("curPos" + curPos);
+            System.out.println("curHead" + curHead);
+            move(nextwall);
+            curPos = moveRobot(my_map, curPos, curHead);
+            updateMap(curPos, curHead);
+            printMap(my_map);
+        }
+        nextHead = 'U';
+        curHead = rotateRobot(curHead, nextHead);
+        System.out.println("curPos" + curPos);
+        System.out.println("curHead" + curHead);
+        */
+
+
 
 	}
 	
@@ -441,8 +525,7 @@ public class ROB301_Project_2018_Student {
 		return g;
 	}
 	
-	// gets 4 neighbours from in this order: U,R,D,L
-	public static char[] getNeighbours(char position, char[][] map, Map<Character, int[]> char_to_position){ 
+		public static char[] getNeighbours(char letter, char[][] map, Map<Character, int[]> char_to_position){
 		/***
 		 * Inputs: position (char identifier of position in map we want to get the neighbours of)
 		 * 		   map (my_map variable above)
@@ -450,26 +533,29 @@ public class ROB301_Project_2018_Student {
 		 * Outputs: character array size between 1 and 4 of the neighbours (e.g. if we query H, return char will be 'C','I','M','G')
 		 * Function: Return neighbors to queried node 
 		***/
-		int[] cur_coord = char_to_position.get(position);
-        char[] neighbours = new char[4]; // UPDATE THIS
-        
-            if (cur_coord[1]-2 >= 0){
-                neighbours[0] = map[cur_coord[0]][cur_coord[1]-2];
-                continue;
-            } 
-            if (cur_coord[0]+2 < 11){
-                neighbours[1] = map[cur_coord[0]+2][cur_coord[1]];
-                continue;
-            }
-            if (cur_coord[1]+2 < 11){
-                neighbours[2] = map[cur_coord[0]][cur_coord[1]+2];
-                continue;
-            } 
-            if (cur_coord[0]-2 >= 0){
-                neighbours[3] = map[cur_coord[0]-2][cur_coord[1]];
-                continue;
-            }
-            
+		
+		char[] neighbours = {'Z','Z','Z','Z'}; // Initialize neighbours to null type
+		int[] coord = new int[2];
+		coord = char_to_position.get(letter);
+		int n_index = 0;
+		
+		//Check if any of the four neighbouring positions are free for the robot to travel to
+		if(map[coord[0]-1][coord[1]] == '0'){
+			neighbours[n_index] = map[coord[0]-2][coord[1]];
+			n_index++;
+		}
+		if(map[coord[0]+1][coord[1]] == '0'){
+			neighbours[n_index] = map[coord[0]+2][coord[1]];
+			n_index++;
+		}
+		if(map[coord[0]][coord[1]-1] == '0'){
+			neighbours[n_index] = map[coord[0]][coord[1]-2];
+			n_index++;
+		}
+		if(map[coord[0]][coord[1]+1] == '0'){
+			neighbours[n_index] = map[coord[0]][coord[1]+2];
+		}
+		
 		return neighbours;
 	}
 	
